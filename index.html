@@ -34,9 +34,9 @@
       margin-bottom: 20px;
     }
     .input, .person-input {
-      width: calc(50% - 10px);
+      width: 100%;
       padding: 15px;
-      margin: 10px 5px;
+      margin: 10px 0;
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 18px;
@@ -46,6 +46,7 @@
       display: flex;
       margin: 10px 0;
       align-items: center;
+      gap: 10px;
     }
     .delete-button {
       background-color: #FF5252;
@@ -53,15 +54,18 @@
       border-radius: 8px;
       color: white;
       cursor: pointer;
-      padding: 10px;
+      padding: 15px;
+      height: 52px;
+      box-sizing: border-box;
     }
     .results-container {
       background-color: #fff;
-      padding: 20px;
+      padding: 10px;
       border-radius: 8px;
       border: 1px solid #ccc;
-      margin: 20px 0;
+      margin: 10px 0;
       width: 100%;
+      box-sizing: border-box;
     }
     .results-title {
       font-size: 22px;
@@ -90,7 +94,12 @@
 
   <script>
     let people = [];
-    let darkTheme = false;
+    let darkTheme = localStorage.getItem('darkTheme') === 'true';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      applyTheme();
+      renderPeople();
+    });
 
     function addPerson() {
       people.push({ name: '', hours: '' });
@@ -160,6 +169,11 @@
 
     function toggleTheme() {
       darkTheme = !darkTheme;
+      localStorage.setItem('darkTheme', darkTheme);
+      applyTheme();
+    }
+
+    function applyTheme() {
       document.body.style.backgroundColor = darkTheme ? '#121212' : '#f3f4f6';
       document.body.style.color = darkTheme ? '#fff' : '#333';
       const buttons = document.querySelectorAll('.theme-button, .add-button, .calculate-button');
