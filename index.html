@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tip Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f3f4f6;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+    }
+    .theme-button, .add-button, .calculate-button {
+      background-color: #333;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      margin: 10px 0;
+    }
+    .title {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    .input, .person-input {
+      width: calc(50% - 10px);
+      padding: 15px;
+      margin: 10px 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 18px;
+      box-sizing: border-box;
+    }
+    .person-container {
+      display: flex;
+      margin: 10px 0;
+      align-items: center;
+    }
+    .delete-button {
+      background-color: #FF5252;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      padding: 10px;
+    }
+    .results-container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin: 20px 0;
+      width: 100%;
+    }
+    .results-title {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .result-text {
+      font-size: 18px;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <button class="theme-button" onclick="toggleTheme()">Toggle Dark Theme</button>
+    <h1 class="title">Tip Calculator</h1>
+    <div class="results-container" id="results-container" style="display: none;">
+      <h2 class="results-title">Results</h2>
+      <div id="results"></div>
+    </div>
+    <input type="number" id="totalTips" class="input" placeholder="Enter total tips">
+    <div id="people-container"></div>
+    <button class="add-button" onclick="addPerson()">Add Person</button>
+    <button class="calculate-button" onclick="calculateTips()">Calculate Tips</button>
+  </div>
+
+  <script>
+    let people = [];
+    let darkTheme = false;
+
+    function addPerson() {
+      people.push({ name: '', hours: '' });
+      renderPeople();
+    }
+
+    function updatePerson(index, field, value) {
+      people[index][field] = value;
+    }
+
+    function removePerson(index) {
+      people.splice(index, 1);
+      renderPeople();
+    }
+
+    function calculateTips() {
+      const totalTips = parseFloat(document.getElementById('totalTips').value);
+      const filteredPeople = people.filter(person => person.name.trim() !== '' && parseFloat(person.hours) > 0);
+      const totalHours = filteredPeople.reduce((sum, person) => sum + parseFloat(person.hours || '0'), 0);
+      const tipPerHour = totalTips / totalHours;
+
+      const resultsContainer = document.getElementById('results-container');
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '';
+      filteredPeople.forEach(person => {
+        const tip = (parseFloat(person.hours) * tipPerHour).toFixed(2);
+        const resultText = document.createElement('div');
+        resultText.className = 'result-text';
+        resultText.innerText = `${person.name}: $${tip}`;
+        resultsDiv.appendChild(resultText);
+      });
+      resultsContainer.style.display = filteredPeople.length > 0 ? 'block' : 'none';
+    }
+
+    function renderPeople() {
+      const peopleContainer = document.getElementById('people-container');
+      peopleContainer.innerHTML = '';
+      people.forEach((person, index) => {
+        const personContainer = document.createElement('div');
+        personContainer.className = 'person-container';
+
+        const nameInput = document.createElement('input');
+        nameInput.className = 'person-input';
+        nameInput.placeholder = 'Name';
+        nameInput.value = person.name;
+        nameInput.oninput = (e) => updatePerson(index, 'name', e.target.value);
+
+        const hoursInput = document.createElement('input');
+        hoursInput.className = 'person-input';
+        hoursInput.placeholder = 'Hours';
+        hoursInput.type = 'number';
+        hoursInput.value = person.hours;
+        hoursInput.oninput = (e) => updatePerson(index, 'hours', e.target.value);
+
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'delete-button';
+        deleteButton.innerText = 'Delete';
+        deleteButton.onclick = () => removePerson(index);
+
+        personContainer.appendChild(nameInput);
+        personContainer.appendChild(hoursInput);
+        personContainer.appendChild(deleteButton);
+
+        peopleContainer.appendChild(personContainer);
+      });
+    }
+
+    function toggleTheme() {
+      darkTheme = !darkTheme;
+      document.body.style.backgroundColor = darkTheme ? '#121212' : '#f3f4f6';
+      document.body.style.color = darkTheme ? '#fff' : '#333';
+      const buttons = document.querySelectorAll('.theme-button, .add-button, .calculate-button');
+      buttons.forEach(button => {
+        button.style.backgroundColor = darkTheme ? '#bbb' : '#333';
+        button.style.color = darkTheme ? '#333' : '#fff';
+      });
+      const resultsContainer = document.getElementById('results-container');
+      resultsContainer.style.backgroundColor = darkTheme ? '#333' : '#fff';
+      resultsContainer.style.borderColor = darkTheme ? '#555' : '#ccc';
+      const resultTexts = document.querySelectorAll('.result-text');
+      resultTexts.forEach(resultText => {
+        resultText.style.color = darkTheme ? '#fff' : '#333';
+      });
+    }
+  </script>
+</body>
+</html>
